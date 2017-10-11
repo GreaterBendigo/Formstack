@@ -94,10 +94,10 @@ class FormstackFormWidget extends WidgetBase implements ContainerFactoryPluginIn
     $response = $formstack->form($formstack_id)->getResult();
     $fields = [];
     foreach ($response->fields as $field) {
-      $fields[] = 'field' . $field->id . ' - ' . $field->label;
+      $fields[] = 'field' . $field->id . '|' . $field->label;
       if ($field->type == 'name') {
-        $fields[] = 'field' . $field->id . '-first - ' . $field->label . ' (First)';
-        $fields[] = 'field' . $field->id . '-last - ' . $field->label . ' (Last)';
+        $fields[] = 'field' . $field->id . '-first|' . $field->label . ' (First)';
+        $fields[] = 'field' . $field->id . '-last|' . $field->label . ' (Last)';
       }
     }
     return [
@@ -165,7 +165,7 @@ class FormstackFormWidget extends WidgetBase implements ContainerFactoryPluginIn
 
     if (!empty($items->formstack_id)) {
       $details = self::getFormDetails($items->formstack_id);
-      $details['#prefix'] = '<div id="formstack-default-values-' . $delta . '-container"></div>';
+      $details['#prefix'] = '<div id="formstack-default-values-' . $delta . '-container">';
       $details['#suffix'] = '</div>';
     }
     else {
@@ -193,7 +193,9 @@ class FormstackFormWidget extends WidgetBase implements ContainerFactoryPluginIn
         $default_values = [];
         foreach (explode("\n", $value['default_values']) as $row) {
           $split = explode('|', $row);
-          $default_values[trim($split[0])] = trim($split[1]);
+          if (!empty($split[0]) && !empty($split[1])) {
+            $default_values[trim($split[0])] = trim($split[1]);
+          }
         }
         if (!empty($default_values)) {
           $value['settings'] = serialize(compact('default_values'));
